@@ -22,6 +22,12 @@ def test_statistical_anomalies_use_resolved_tickets_only() -> None:
     assert result.summary["resolution_iqr_upper_bound_hours"] == 48.15
 
 
+def test_normal_resolved_ticket_is_not_a_statistical_anomaly() -> None:
+    detector = AnomalyDetector(load_tickets(Path("data/support_tickets.csv")))
+    anomaly_ids = {item.ticket_id for item in detector.detect("statistical").anomalies}
+    assert "TKT-001" not in anomaly_ids
+
+
 def test_this_week_statistical_anomalies() -> None:
     detector = AnomalyDetector(load_tickets(Path("data/support_tickets.csv")))
     start = detector.reference_timestamp.normalize() - timedelta(days=int(detector.reference_timestamp.weekday()))

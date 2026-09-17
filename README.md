@@ -169,6 +169,14 @@ Run the full suite without Ollama, credentials, or internet:
 
 Tests cover actual CSV loading and null semantics, query ground truth, date filters, IQR behavior, mocked LLM parsing and retry, API endpoints, malformed requests, unavailable LLM behavior, and hostile prompt-injection examples.
 
+## Error handling
+
+- Invalid or missing HTTP request fields return FastAPI validation responses (`422`).
+- Empty, unsafe, unsupported, ambiguous, and invalid-model query intents return a controlled `400` response without executing a data operation.
+- An unavailable Ollama dependency returns `503` from `/query`; `/health` remains available and reports the dependency state separately.
+- Dataset schema failures stop application startup clearly instead of silently dropping or repairing ticket records.
+- Unexpected server failures do not expose secrets, system prompts, environment variables, or Python tracebacks to API clients.
+
 ## Known limitations
 
 - The local model must be installed and running for real natural-language queries. The repository deliberately does not silently fall back to a rules-only parser in production.
@@ -176,6 +184,13 @@ Tests cover actual CSV loading and null semantics, query ground truth, date filt
 - The structured query language targets the assessment analytics set, not arbitrary analytics or conversational follow-ups.
 - Pandas is appropriate for 500 rows but a larger concurrent production workload would use a database, authentication, rate limits, observability, and a model gateway.
 - Docker Compose expects a host Ollama installation rather than attempting to package a model download in the application image.
+
+## Future improvements
+
+- Replace the in-memory Pandas repository with PostgreSQL for larger datasets and concurrent workloads.
+- Add authentication, authorization, rate limits, and structured observability for a multi-user deployment.
+- Add a model gateway with response monitoring and optional alternative local models.
+- Extend the controlled query language with more explicitly validated analytical operations and pagination controls.
 
 ## Walkthrough talking points
 
